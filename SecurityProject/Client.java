@@ -8,17 +8,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
 public class Client {
     // constants
     final static int PORT = 3500;
     final static String HOST = "localhost";
 
-    public static Socket client = null;
+    public static SSLSocket client = null;
     private static DataInputStream in = null;
     private static Scanner sc = null;
     private static BufferedReader br = null;
     private static PrintWriter pr = null;
+    private static SSLSocketFactory sslFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
 
     // recieve cat pic from server String fileName
     private static void recieveFile() {
@@ -57,11 +60,18 @@ public class Client {
 
         try {
             // init io and socket
-            client = new Socket(HOST, PORT);
+            client = (SSLSocket) sslFactory.createSocket(HOST, PORT);
             in = new DataInputStream(client.getInputStream());
             br = new BufferedReader(new InputStreamReader(client.getInputStream()));
             pr = new PrintWriter(client.getOutputStream(), true);
             sc = new Scanner(System.in);
+
+            // start handshake
+            client.startHandshake();
+
+            if (pr.checkError()) { // check for error
+                System.out.println("SSLSocketClient:  java.io.PrintWriter error");
+            }
 
             String cmd; // holds commands from user
             String res; // response from server

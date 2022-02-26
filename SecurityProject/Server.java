@@ -1,22 +1,24 @@
 package SecurityProject;
 
 import java.net.*;
+import javax.net.ssl.*;
 import java.io.*;
 
 public class Server {
     final static int PORT = 3500;
 
     public static void main(String[] args) {
-        ServerSocket serverSocket;
+        SSLServerSocketFactory sslServerFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+        SSLServerSocket serverSocket;
 
         try {
             // start server
-            serverSocket = new ServerSocket(PORT);
+            serverSocket = (SSLServerSocket) sslServerFactory.createServerSocket(PORT);
             System.out.println("Server Started and waiting for connection");
 
             while (true) {
                 // connet client to server
-                Socket client = serverSocket.accept();
+                SSLSocket client = null;// serverSocket.accept();
                 System.out.println("Client connected from " + client.getLocalAddress() + ":" + client.getLocalPort());
 
                 // start a new thread for client
