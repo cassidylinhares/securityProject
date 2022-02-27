@@ -8,6 +8,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
@@ -17,11 +19,12 @@ public class Client {
     final static String HOST = "localhost";
 
     public static SSLSocket client = null;
+    private static SocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+
     private static DataInputStream in = null;
     private static Scanner sc = null;
     private static BufferedReader br = null;
     private static PrintWriter pr = null;
-    private static SSLSocketFactory sslFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
 
     // recieve cat pic from server String fileName
     private static void recieveFile() {
@@ -60,18 +63,20 @@ public class Client {
 
         try {
             // init io and socket
-            client = (SSLSocket) sslFactory.createSocket(HOST, PORT);
+            client = (SSLSocket) factory.createSocket(HOST, PORT);
+            SSLParameters sslParams = new SSLParameters();
+
             in = new DataInputStream(client.getInputStream());
             br = new BufferedReader(new InputStreamReader(client.getInputStream()));
             pr = new PrintWriter(client.getOutputStream(), true);
             sc = new Scanner(System.in);
 
-            // start handshake
-            client.startHandshake();
+            // config SSL & SSL Parameters
+            client.setEnabledCipherSuites(new String[] { "TLS_DHE_DSS_WITH_AES_256_CBC_SHA256" });
+            client.setEnabledProtocols(new String[] { "TLSv1.2" });
 
-            if (pr.checkError()) { // check for error
-                System.out.println("SSLSocketClient:  java.io.PrintWriter error");
-            }
+            sslParams.setEndpointIdentificationAlgorithm("HTTPS");
+            client.setSSLParameters(sslParams);
 
             String cmd; // holds commands from user
             String res; // response from server
