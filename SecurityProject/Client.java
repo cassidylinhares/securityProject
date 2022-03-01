@@ -59,7 +59,7 @@ public class Client {
         System.out.println("WELCOME TO CATSU!\nThe random cat generator \n\n");
 
         System.setProperty("javax.net.ssl.trustStore",
-                "C:\\Users\\cass4\\Documents\\securityProject\\SecurityProject\\trustStore.jts");
+                "C:\\Users\\ernes\\IdeaProjects\\securityProject\\SecurityProject\\myTrustStore.jts");
         System.setProperty("javax.net.ssl.trustStorePassword", "abc123");
 
         try {

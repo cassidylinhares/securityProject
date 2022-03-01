@@ -9,7 +9,7 @@ public class Server {
 
     public static void main(String[] args) {
         System.setProperty("javax.net.ssl.keyStore",
-                "C:\\Users\\cass4\\Documents\\securityProject\\SecurityProject\\keyStore.jks");
+                "C:\\Users\\ernes\\IdeaProjects\\securityProject\\SecurityProject\\myKeyStore.jks");
         System.setProperty("javax.net.ssl.keyStorePassword", "abc123");
 
         ServerSocketFactory serverFactory = SSLServerSocketFactory.getDefault();

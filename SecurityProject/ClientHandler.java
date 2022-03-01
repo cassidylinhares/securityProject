@@ -10,8 +10,8 @@ import javax.imageio.ImageIO;
 import javax.net.ssl.SSLSocket;
 
 public class ClientHandler implements Runnable {
-    private final String CUTEPATH = "Assignment1/Cats/cute";
-    private final String MEMEPATH = "Assignment1/Cats/meme";
+    private final String CUTEPATH = "SecurityProject/Cats/cute";
+    private final String MEMEPATH = "SecurityProject/Cats/meme";
     private Socket handler;
 
     private BufferedReader br = null;
