@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
+import javax.net.ssl.SSLSocket;
 
 public class ClientHandler implements Runnable {
     private final String CUTEPATH = "Assignment1/Cats/cute";
@@ -78,7 +79,7 @@ public class ClientHandler implements Runnable {
     }
 
     // constructor
-    public ClientHandler(Socket clientSocket) throws IOException {
+    public ClientHandler(SSLSocket clientSocket) throws IOException {
         this.handler = clientSocket;
     }
 

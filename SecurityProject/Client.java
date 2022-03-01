@@ -18,9 +18,6 @@ public class Client {
     final static int PORT = 3500;
     final static String HOST = "localhost";
 
-    public static SSLSocket client = null;
-    private static SocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-
     private static DataInputStream in = null;
     private static Scanner sc = null;
     private static BufferedReader br = null;
@@ -61,22 +58,29 @@ public class Client {
         System.out.println(" /\\_/\\ \n( o.o )\n > ^ <");
         System.out.println("WELCOME TO CATSU!\nThe random cat generator \n\n");
 
-        try {
-            // init io and socket
-            client = (SSLSocket) factory.createSocket(HOST, PORT);
-            SSLParameters sslParams = new SSLParameters();
+        System.setProperty("javax.net.ssl.trustStore",
+                "C:\\Users\\cass4\\Documents\\securityProject\\SecurityProject\\trustStore.jts");
+        System.setProperty("javax.net.ssl.trustStorePassword", "abc123");
 
+        try {
+            // init socket
+            SocketFactory factory = SSLSocketFactory.getDefault();
+            SSLSocket client = (SSLSocket) factory.createSocket(HOST, PORT);
+            // SSLParameters sslParams = new SSLParameters();
+
+            // init IO
             in = new DataInputStream(client.getInputStream());
             br = new BufferedReader(new InputStreamReader(client.getInputStream()));
             pr = new PrintWriter(client.getOutputStream(), true);
             sc = new Scanner(System.in);
 
             // config SSL & SSL Parameters
-            client.setEnabledCipherSuites(new String[] { "TLS_DHE_DSS_WITH_AES_256_CBC_SHA256" });
-            client.setEnabledProtocols(new String[] { "TLSv1.2" });
+            // client.setEnabledCipherSuites(new String[] {
+            // "TLS_RSA_WITH_AES_256_CBC_SHA256" });
+            // client.setEnabledProtocols(new String[] { "TLSv1.2" });
 
-            sslParams.setEndpointIdentificationAlgorithm("HTTPS");
-            client.setSSLParameters(sslParams);
+            // sslParams.setEndpointIdentificationAlgorithm("HTTPS");
+            // client.setSSLParameters(sslParams);
 
             String cmd; // holds commands from user
             String res; // response from server
