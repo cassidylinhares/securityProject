@@ -1,5 +1,5 @@
+package SecurityProject;
 
-public class Main
-{
+public class Main {
     String password = "abCc34567";
 }
