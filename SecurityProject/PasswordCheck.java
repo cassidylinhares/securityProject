@@ -1,6 +1,6 @@
 package SecurityProject;
 
-class PasswordCheck {
+public class PasswordCheck {
   // public static void main(String[] args) {
   // // replace Main with the class the password orgiginates with
   // Main passObj = new Main();

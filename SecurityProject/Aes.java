@@ -13,29 +13,6 @@ public class Aes {
     private static SecretKey secretKey;
     private static byte[] key;
 
-    // public static void main(String[] argv) throws InvalidKeySpecException,
-    // NoSuchAlgorithmException,
-    // IllegalBlockSizeException, NoSuchPaddingException, IOException,
-    // BadPaddingException, InvalidKeyException {
-    // // this void function is for demotration purposes and can be deleted
-    // String keyPassword = "crypto";
-    // String salt = "sdfksdflk";
-    // System.out.println("key password: " + keyPassword + " salt: " + salt);
-    // System.out.println("Get Key for AES using Password-Based Key Derivation
-    // Function(PBKDF2)");
-    // secretKey = getKeyFromPassword(keyPassword, salt);
-    // decryptFile(secretKey, new File("SecurityProject/Cats/meme2/anger.jpeg"),
-    // new File("SecurityProject/Cats/cute2/anger.jpeg"));
-    // System.out.println("encrypting");
-    // String encrypt = encrypt("HelloWorld", keyPassword);
-
-    // System.out.println(encrypt);
-    // System.out.println("decrypting");
-    // String decrypt = decrypt(encrypt, keyPassword);
-    // System.out.println(decrypt);
-
-    // }
-
     public static void setKey(final String myKey) {
         MessageDigest sha = null;
         try {

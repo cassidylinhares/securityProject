@@ -37,6 +37,7 @@ public class Client {
             bos = new BufferedOutputStream(new FileOutputStream(inputFile.getPath()));
             bos.write(b, 0, b.length);
             bos.flush();
+            bos.close();
             // write image to destination
             System.out.println("Received file\n");
         } catch (IOException e) {
@@ -48,7 +49,7 @@ public class Client {
             SecretKey key = Aes.getKeyFromPassword(password, "jdsfrkjehr");
             Aes.decryptFile(key, inputFile, outputFile);
             inputFile.delete();
-            bos.close();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
