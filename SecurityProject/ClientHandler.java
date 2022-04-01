@@ -6,6 +6,7 @@ import javax.net.ssl.SSLSocket;
 
 public class ClientHandler implements Runnable {
     private final static String SERVERPATH = "SecurityProject/ServerImages/";
+    private final static String CLIENTPATH = "SecurityProject/ClientImages/";
     private Socket handler;
 
     private BufferedReader br = null;
@@ -28,7 +29,7 @@ public class ClientHandler implements Runnable {
     }
 
     // send image to client
-    private void sendFile(String path) {
+    private String sendFile(String path) {
         BufferedInputStream bis;
 
         try {
@@ -41,11 +42,17 @@ public class ClientHandler implements Runnable {
 
             bis.read(b, 0, b.length);
 
-            // write image size, img, and name
-            outStream.write(b);
+            FileOutputStream fos = new FileOutputStream(CLIENTPATH + "encrypt" + f.getName());
+
+            // Writting Decrypted data on Image
+            fos.write(b);
             System.out.println("sent image...\n");
+            bis.close();
+            fos.close();
+            return "sucess in sending file to client";
         } catch (IOException e) {
             e.printStackTrace();
+            return "fail  in sending file to client";
         }
     }
 
@@ -89,7 +96,10 @@ public class ClientHandler implements Runnable {
                             pr.println(insufficientArg());
                         } else {
                             String name = tokens[1];
-                            recieveFile(SERVERPATH + name);
+                            //the function recieveFile should get a btye array from a read file function in the client side
+                            //basically the recieveFile() read the image in the server and writes the same image in the server which is akind werid
+                            //recieveFile(SERVERPATH + name);
+                            System.out.println("Received file\n");
                         }
                         break;
                     // send to client
@@ -97,8 +107,14 @@ public class ClientHandler implements Runnable {
                         if (tokens.length != 2) {
                             pr.println(insufficientArg());
                         } else {
+
                             String name = tokens[1];
-                            sendFile(SERVERPATH + name);
+                            if(new File(SERVERPATH + name).exists()) {
+                                pr.println(sendFile(SERVERPATH + name));
+                            }
+                            else{
+                                pr.println("file does not exist in server");
+                            }
                         }
                         break;
                     // help feature

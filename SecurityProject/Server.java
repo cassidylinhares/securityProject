@@ -11,7 +11,7 @@ public class Server {
         String home = System.getProperty("user.home");
 
         System.setProperty("javax.net.ssl.keyStore",
-                home + "/Documents/securityProject/SecurityProject/myKeyStore.jks");
+                "SecurityProject/myKeyStore.jks");
         System.setProperty("javax.net.ssl.keyStorePassword", "abc123");
 
         ServerSocketFactory serverFactory = SSLServerSocketFactory.getDefault();
