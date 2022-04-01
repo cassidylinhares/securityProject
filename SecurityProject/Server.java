@@ -8,8 +8,10 @@ public class Server {
     final static int PORT = 3500;
 
     public static void main(String[] args) {
+        String home = System.getProperty("user.home");
+
         System.setProperty("javax.net.ssl.keyStore",
-                "C:\\Users\\ernes\\IdeaProjects\\securityProject\\SecurityProject\\myKeyStore.jks");
+                home + "/Documents/securityProject/SecurityProject/myKeyStore.jks");
         System.setProperty("javax.net.ssl.keyStorePassword", "abc123");
 
         ServerSocketFactory serverFactory = SSLServerSocketFactory.getDefault();
@@ -18,10 +20,6 @@ public class Server {
         try {
             // start server
             serverSocket = (SSLServerSocket) serverFactory.createServerSocket(PORT);
-            // serverSocket.setNeedClientAuth(false);
-            // serverSocket.setEnabledCipherSuites(new String[] {
-            // "TLS_RSA_WITH_AES_256_CBC_SHA256" });
-            // serverSocket.setEnabledProtocols(new String[] { "TLSv1.2" });
 
             System.out.println("Server Started and waiting for connection");
 

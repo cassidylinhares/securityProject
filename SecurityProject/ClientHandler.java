@@ -1,44 +1,17 @@
 package SecurityProject;
 
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.*;
-import java.nio.ByteBuffer;
-import java.util.Random;
-
-import javax.imageio.ImageIO;
 import javax.net.ssl.SSLSocket;
 
 public class ClientHandler implements Runnable {
-    private final String CUTEPATH = "SecurityProject/Cats/cute";
-    private final String MEMEPATH = "SecurityProject/Cats/meme";
+    private final static String SERVERPATH = "SecurityProject/ServerImages/";
     private Socket handler;
 
     private BufferedReader br = null;
     private PrintWriter pr = null;
-    private DataOutputStream out = null;
-
-    // gets name of random cute cat pic
-    private String randomCute() {
-        Random rand = new Random();
-        File f = new File(CUTEPATH);
-
-        String[] pics = f.list();
-        int r = rand.nextInt(pics.length);
-
-        return pics[r];
-    }
-
-    // gets name of random meme cat pic
-    private String randomMeme() {
-        Random rand = new Random();
-        File f = new File(MEMEPATH);
-
-        String[] pics = f.list();
-        int r = rand.nextInt(pics.length);
-
-        return pics[r];
-    }
+    private InputStream is = null;
+    private OutputStream outStream = null;
 
     // tell client their command is wrong
     private String insufficientArg() {
@@ -47,32 +20,47 @@ public class ClientHandler implements Runnable {
 
     // return usage of all commands
     public String getCliCommands() {
-        return "'catsu' - returns a random meme cat pic - USAGE: catsu" +
-                "\n'floof' - returns a random cute cat pic - USAGE: floof" +
+        return "'get <path-to-image>' - get an encrypted image from server - USAGE: get <path-to-image>" +
+                "\n'send <path-to-image>' - send an encrypted image to server - USAGE: send <path-to-image>" +
                 "\n'help' 'h' - for commands and usage - USAGE: help OR h " +
                 "\n'stop' 'disconnect' 'bye' - closes cat generator - USAGE: stop OR bye OR disconnect " +
                 "\r\n\n\0";
     }
 
     // send image to client
-    private void sendFile(String path, String name) {
+    private void sendFile(String path) {
+        BufferedInputStream bis;
+
         try {
             // open image
             System.out.println("Sending " + path);
-            BufferedImage img = ImageIO.read(new File(path));
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            File f = new File(path);
+            byte[] b = new byte[(int) f.length()];
 
-            // write image to array stream
-            ImageIO.write(img, "jpeg", baos);
-            byte[] size = ByteBuffer.allocate(4).putInt(baos.size()).array();
+            bis = new BufferedInputStream(new FileInputStream(path));
+
+            bis.read(b, 0, b.length);
 
             // write image size, img, and name
-            out.write(size);
-            out.write(baos.toByteArray());
-            out.write(name.getBytes());
-            out.flush();
-
+            outStream.write(b);
             System.out.println("sent image...\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // get image from client
+    private void recieveFile(String path) {
+        try {
+            byte[] b = new byte[8000];
+            is.read(b);
+            File fileDown = new File(path);
+            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fileDown.getPath()));
+            bos.write(b, 0, b.length);
+            bos.flush();
+            bos.close();
+            // write image to destination
+            System.out.println("Received file\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -88,34 +76,37 @@ public class ClientHandler implements Runnable {
         try {
             br = new BufferedReader(new InputStreamReader(handler.getInputStream()));
             pr = new PrintWriter(handler.getOutputStream(), true);
-            out = new DataOutputStream(handler.getOutputStream());
+            outStream = handler.getOutputStream();
+            is = handler.getInputStream();
 
             String cmd;
             while ((cmd = br.readLine()) != null) {
                 String[] tokens = cmd.split("\\s+");
                 switch (tokens[0]) {
+                    // recieve from client
+                    case "send":
+                        if (tokens.length != 2) {
+                            pr.println(insufficientArg());
+                        } else {
+                            String name = tokens[1];
+                            recieveFile(SERVERPATH + name);
+                        }
+                        break;
+                    // send to client
+                    case "get":
+                        if (tokens.length != 2) {
+                            pr.println(insufficientArg());
+                        } else {
+                            String name = tokens[1];
+                            sendFile(SERVERPATH + name);
+                        }
+                        break;
                     // help feature
                     case "help":
                     case "h":
-                        pr.println(getCliCommands());
-                        break;
-                    // random meme cat
-                    case "catsu":
-                        if (tokens.length != 1) {
-                            pr.println(insufficientArg());
-                        } else {
-                            String name = randomMeme();
-                            sendFile(MEMEPATH + "/" + name, name);
-                        }
-                        break;
                     default:
-                        // check for error otherwise random cute cat pic
-                        if (tokens.length != 1) {
-                            pr.println(insufficientArg());
-                        } else {
-                            String name = randomCute();
-                            sendFile(CUTEPATH + "/" + name, name);
-                        }
+                        // check give the help commands
+                        pr.println(getCliCommands());
                         break;
                 }
             }
@@ -127,7 +118,7 @@ public class ClientHandler implements Runnable {
         } finally {
             try {
                 br.close();
-                out.close();
+                is.close();
                 pr.close();
             } catch (IOException e) {
                 System.out.println(e);
