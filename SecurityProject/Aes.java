@@ -71,49 +71,63 @@ public class Aes {
     public static void encryptFile(SecretKey key, File inputFile, File outputFile)
             throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException,
             NoSuchPaddingException, NoSuchAlgorithmException {
-
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
-        cipher.init(Cipher.ENCRYPT_MODE, key);
         FileInputStream inputStream = new FileInputStream(inputFile);
         FileOutputStream outputStream = new FileOutputStream(outputFile);
-        byte[] buffer = new byte[64];
-        int bytesRead;
-        while ((bytesRead = inputStream.read(buffer)) != -1) {
-            byte[] output = cipher.update(buffer, 0, bytesRead);
-            if (output != null) {
-                outputStream.write(output);
+        try {
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+
+            byte[] buffer = new byte[64];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                byte[] output = cipher.update(buffer, 0, bytesRead);
+                if (output != null) {
+                    outputStream.write(output);
+                }
             }
-        }
-        byte[] outputBytes = cipher.doFinal();
-        if (outputBytes != null) {
-            outputStream.write(outputBytes);
+            byte[] outputBytes = cipher.doFinal();
+            if (outputBytes != null) {
+                outputStream.write(outputBytes);
+            }
+
+        }catch (Exception e){
+            System.out.println(e.toString());
+            System.out.println("Invalid key");
         }
         inputStream.close();
         outputStream.close();
+
     }
 
     public static void decryptFile(SecretKey key, File inputFile, File outputFile)
             throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException,
             NoSuchPaddingException, NoSuchAlgorithmException {
-        System.out.println("Decrypting image " + inputFile.getName());
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
-        cipher.init(Cipher.DECRYPT_MODE, key);
         FileInputStream inputStream = new FileInputStream(inputFile);
         FileOutputStream outputStream = new FileOutputStream(outputFile);
-        byte[] buffer = new byte[64];
-        int bytesRead;
-        while ((bytesRead = inputStream.read(buffer)) != -1) {
-            byte[] output = cipher.update(buffer, 0, bytesRead);
-            if (output != null) {
-                outputStream.write(output);
+        try {
+            System.out.println("Decrypting image " + inputFile.getName());
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+            cipher.init(Cipher.DECRYPT_MODE, key);
+
+            byte[] buffer = new byte[64];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                byte[] output = cipher.update(buffer, 0, bytesRead);
+                if (output != null) {
+                    outputStream.write(output);
+                }
             }
-        }
-        byte[] outputBytes = cipher.doFinal();
-        if (outputBytes != null) {
-            outputStream.write(outputBytes);
+            byte[] outputBytes = cipher.doFinal();
+            if (outputBytes != null) {
+                outputStream.write(outputBytes);
+            }
+
+            System.out.println("Finished Decrypting");
+        }catch (Exception e){
+            System.out.println(e.toString());
+            System.out.println("Invalid key");
         }
         inputStream.close();
         outputStream.close();
-        System.out.println("Finished Decrypting");
     }
 }
