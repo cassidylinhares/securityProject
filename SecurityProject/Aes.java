@@ -71,11 +71,12 @@ public class Aes {
     public static void encryptFile(SecretKey key, File inputFile, File outputFile)
             throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException,
             NoSuchPaddingException, NoSuchAlgorithmException {
+        FileInputStream inputStream = new FileInputStream(inputFile);
+        FileOutputStream outputStream = new FileOutputStream(outputFile);
         try {
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
             cipher.init(Cipher.ENCRYPT_MODE, key);
-            FileInputStream inputStream = new FileInputStream(inputFile);
-            FileOutputStream outputStream = new FileOutputStream(outputFile);
+
             byte[] buffer = new byte[64];
             int bytesRead;
             while ((bytesRead = inputStream.read(buffer)) != -1) {
@@ -88,24 +89,26 @@ public class Aes {
             if (outputBytes != null) {
                 outputStream.write(outputBytes);
             }
-            inputStream.close();
-            outputStream.close();
+
         }catch (Exception e){
             System.out.println(e.toString());
             System.out.println("Invalid key");
         }
+        inputStream.close();
+        outputStream.close();
 
     }
 
     public static void decryptFile(SecretKey key, File inputFile, File outputFile)
             throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException,
             NoSuchPaddingException, NoSuchAlgorithmException {
+        FileInputStream inputStream = new FileInputStream(inputFile);
+        FileOutputStream outputStream = new FileOutputStream(outputFile);
         try {
             System.out.println("Decrypting image " + inputFile.getName());
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
             cipher.init(Cipher.DECRYPT_MODE, key);
-            FileInputStream inputStream = new FileInputStream(inputFile);
-            FileOutputStream outputStream = new FileOutputStream(outputFile);
+
             byte[] buffer = new byte[64];
             int bytesRead;
             while ((bytesRead = inputStream.read(buffer)) != -1) {
@@ -118,12 +121,13 @@ public class Aes {
             if (outputBytes != null) {
                 outputStream.write(outputBytes);
             }
-            inputStream.close();
-            outputStream.close();
+
             System.out.println("Finished Decrypting");
         }catch (Exception e){
             System.out.println(e.toString());
             System.out.println("Invalid key");
         }
+        inputStream.close();
+        outputStream.close();
     }
 }
