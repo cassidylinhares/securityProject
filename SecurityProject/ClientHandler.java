@@ -42,7 +42,7 @@ public class ClientHandler implements Runnable {
 
             bis.read(b, 0, b.length);
 
-            FileOutputStream fos = new FileOutputStream(CLIENTPATH + "encrypt" + f.getName());
+            FileOutputStream fos = new FileOutputStream(CLIENTPATH + f.getName());
 
             // Writting Decrypted data on Image
             fos.write(b);
@@ -95,10 +95,6 @@ public class ClientHandler implements Runnable {
                         if (tokens.length != 2) {
                             pr.println(insufficientArg());
                         } else {
-                            String name = tokens[1];
-                            //the function recieveFile should get a btye array from a read file function in the client side
-                            //basically the recieveFile() read the image in the server and writes the same image in the server which is akind werid
-                            //recieveFile(SERVERPATH + name);
                             System.out.println("Received file\n");
                         }
                         break;
@@ -109,11 +105,10 @@ public class ClientHandler implements Runnable {
                         } else {
 
                             String name = tokens[1];
-                            if(new File(SERVERPATH + name).exists()) {
-                                pr.println(sendFile(SERVERPATH + name));
-                            }
-                            else{
-                                pr.println("file does not exist in server");
+                            if (new File(SERVERPATH + name).exists()) {
+                                pr.println("Sucessfully sent encrypted image to client");
+                            } else {
+                                pr.println("File does not exist in server");
                             }
                         }
                         break;

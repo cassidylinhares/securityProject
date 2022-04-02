@@ -17,69 +17,36 @@ public class Client {
     final static String HOST = "localhost";
 
     private static InputStream is = null;
-    private static OutputStream outStream = null;
     private static Scanner sc = null;
     private static BufferedReader br = null;
     private static PrintWriter pr = null;
 
     // recieve encrypted pic from server and decrypt
     private static void recieveFile(String path, String name, String password) {
-        File outputFile = new File(path);
-        File inputFile = new File(CLIENTPATH + "encrypt" + outputFile.getName());
-        BufferedOutputStream bos = null;
-
-        //this is sus
-        //server sends the encrypted image first tho?
-        //and the client also recieve the image from a file name decrypt something?
-        // get encrypted image
-//        try {
-//            FileInputStream fis = new FileInputStream(
-//                    "C:\\Users\\lenovo\\Pictures\\logo4.png");
-//            // get data from server
-//            byte[] b = new byte[8000];
-//            is.read(b);
-//
-//            bos = new BufferedOutputStream(new FileOutputStream(inputFile.getPath()));
-//            bos.write(b, 0, b.length);
-//            bos.flush();
-//            // write image to destination
-//            System.out.println("Received file\n");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
+        File outputFile = new File(CLIENTPATH + name);
+        File inputFile = new File(path);
         // decrypt image
         try {
             SecretKey key = Aes.getKeyFromPassword(password, "jdsfrkjehr");
-            if(inputFile.exists()) {
-                Aes.decryptFile(key, inputFile, outputFile);
-            }
+            Aes.decryptFile(key, inputFile, outputFile);
+            System.out.println("Decrypted image: " + outputFile.getPath() + "\n");
 
-            //bos.close();
         } catch (Exception e) {
 
-            if(inputFile.delete()){
-                System.out.println("detled");
-            }
-            else{
-                System.out.println("detled232");
+            if (inputFile.delete()) {
+                System.out.println("deleted");
+            } else {
+                System.out.println("deleted");
             }
             e.printStackTrace();
         }
-        if(inputFile.exists()) {
-            System.out.println("exist");
-            if (inputFile.delete()) {
-                System.out.println("detled");
-            } else {
-                System.out.println("detled232");
-            }
+        if (inputFile.exists()) {
+            inputFile.delete();
         }
     }
 
     // encrypt and send encrypted pic to server
     private static void sendFile(String path, String name, String password) {
-        BufferedInputStream bis;
-        //String newPath = SERVERPATH + "encrypt" + name;
         String newPath = SERVERPATH + name;
         File inputFile = new File(path);
         File outputFile = new File(newPath);
@@ -88,42 +55,19 @@ public class Client {
         try {
             SecretKey key = Aes.getKeyFromPassword(password, "jdsfrkjehr");
             Aes.encryptFile(key, inputFile, outputFile);
-            System.out.println("Encrypted image: " + outputFile.getPath());
+            System.out.println("Encrypted image sent to: " + outputFile.getPath() + "\n");
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        // send encrypted image
-//        try {
-//            // open image
-//            System.out.println("Sending " + path);
-//            byte[] b = new byte[(int) outputFile.length()];
-//
-//            bis = new BufferedInputStream(new FileInputStream(newPath));
-//
-//            bis.read(b, 0, b.length);
-
-            // write image size, img, and name
-//            outStream.write(b);
-//            System.out.println("sent image...\n");
-
-            //when you upload a non-encrypted image, u dont delete the orginal image file like when users submit a file, it copies the file and sends it
-            //idk why u delete the outputfile too
-            // delete non-encrypted images
-//            inputFile.delete();
-//            outputFile.delete();
-//            bis.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        if (inputFile.exists()) {
+            inputFile.delete();
+        }
     }
 
     public static void main(String[] args) {
         // welcome msg
         System.out.println(" /\\_/\\ \n( o.o )\n > ^ <");
-        System.out.println("WELCOME TO CATSU!\nThe random cat generator \n\n");
-
-        String home = System.getProperty("user.home");
+        System.out.println("WELCOME TO PHOTO LOCKER!\n\n");
 
         System.setProperty("javax.net.ssl.trustStore",
                 "SecurityProject/myTrustStore.jts");
@@ -136,7 +80,6 @@ public class Client {
 
             // init IO
             is = client.getInputStream();
-            outStream = client.getOutputStream();
             br = new BufferedReader(new InputStreamReader(client.getInputStream()));
             pr = new PrintWriter(client.getOutputStream(), true);
             sc = new Scanner(System.in);
@@ -161,13 +104,12 @@ public class Client {
                         if (tokens.length == 2) {
 
                             String name = tokens[1];
-                            if(new File(CLIENTPATH + name).exists()) {
+                            if (!new File(CLIENTPATH + name).exists()) {
                                 System.out.print("Please enter the password you encrypted image with: ");
                                 String password = sc.nextLine();
-                                recieveFile(CLIENTPATH + name, name, password);
-                            }
-                            else{
-                                System.out.println("file does not exist in client");
+                                recieveFile(SERVERPATH + name, name, password);
+                            } else {
+                                System.out.println("file already exist in client");
                             }
                         } else {
                             while (!(res = br.readLine()).equals("\0")) {
@@ -181,18 +123,16 @@ public class Client {
                         // check for error or recieve pic
                         if (tokens.length == 2) {
                             String name = tokens[1];
-                            if(new File(CLIENTPATH + name).exists()) {
+                            if (new File(CLIENTPATH + name).exists()) {
                                 System.out.print("Please enter a password to encrypt image with: ");
                                 String password = sc.nextLine();
                                 while (!PasswordCheck.passwordChecker(password)) {
                                     System.out.print("Please enter a stronger password: ");
                                     password = sc.nextLine();
                                 }
-                                System.out.println(name + " " + password);
                                 sendFile(CLIENTPATH + name, name, password);
-                            }
-                            else{
-                                System.out.println("file does not exist in client");
+                            } else {
+                                System.out.println("file does not exist in server");
                             }
                         } else {
                             while (!(res = br.readLine()).equals("\0")) {
