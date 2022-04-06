@@ -99,11 +99,12 @@ public class Aes {
 
     }
 
-    public static void decryptFile(SecretKey key, File inputFile, File outputFile)
+    public static Boolean decryptFile(SecretKey key, File inputFile, File outputFile)
             throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException,
             NoSuchPaddingException, NoSuchAlgorithmException {
         FileInputStream inputStream = new FileInputStream(inputFile);
-        FileOutputStream outputStream = new FileOutputStream(outputFile);
+        File file = new File("placeholder.jpeg");
+        FileOutputStream outputStream = new FileOutputStream(file);
         try {
             System.out.println("Decrypting image " + inputFile.getName());
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
@@ -121,13 +122,20 @@ public class Aes {
             if (outputBytes != null) {
                 outputStream.write(outputBytes);
             }
-
+            inputStream.close();
+            outputStream.close();
+            file.renameTo(outputFile);
             System.out.println("Finished Decrypting");
+            return true;
         }catch (Exception e){
+            inputStream.close();
+            outputStream.close();
+            file.delete();
             System.out.println(e.toString());
             System.out.println("Invalid key");
+            return false;
+
         }
-        inputStream.close();
-        outputStream.close();
+
     }
 }

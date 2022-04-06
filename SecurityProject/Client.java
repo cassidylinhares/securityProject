@@ -25,23 +25,23 @@ public class Client {
     private static void recieveFile(String path, String name, String password) {
         File outputFile = new File(CLIENTPATH + name);
         File inputFile = new File(path);
-        // decrypt image
         try {
+
+
+            Boolean checkDecryptionError = true;
+
+            // decrypt image
             SecretKey key = Aes.getKeyFromPassword(password, "jdsfrkjehr");
-            Aes.decryptFile(key, inputFile, outputFile);
+            //If return true, then decryption successful
+            checkDecryptionError = Aes.decryptFile(key, inputFile, outputFile);
             System.out.println("Decrypted image: " + outputFile.getPath() + "\n");
 
-        } catch (Exception e) {
 
-            if (inputFile.delete()) {
-                System.out.println("deleted");
-            } else {
-                System.out.println("deleted");
+            if (inputFile.exists()&&checkDecryptionError) {
+                inputFile.delete();
             }
+        }catch (Exception e){
             e.printStackTrace();
-        }
-        if (inputFile.exists()) {
-            inputFile.delete();
         }
     }
 
@@ -98,13 +98,14 @@ public class Client {
                     case "get":
                         // send command
                         pr.println(cmd);
-                        System.out.println(br.readLine());
+                        String getReponse =br.readLine();
+                        System.out.println(getReponse);
 
                         // check for error or recieve pic
                         if (tokens.length == 2) {
 
                             String name = tokens[1];
-                            if (!new File(CLIENTPATH + name).exists()) {
+                            if (!(new File(CLIENTPATH + name).exists()||getReponse.equals("File does not exist in server"))) {
                                 System.out.print("Please enter the password you encrypted image with: ");
                                 String password = sc.nextLine();
                                 recieveFile(SERVERPATH + name, name, password);
@@ -120,19 +121,23 @@ public class Client {
                     case "send":
                         // send command
                         pr.println(cmd);
+                        String sendReponse =br.readLine();
+                        System.out.println(sendReponse);
                         // check for error or recieve pic
                         if (tokens.length == 2) {
                             String name = tokens[1];
-                            if (new File(CLIENTPATH + name).exists()) {
-                                System.out.print("Please enter a password to encrypt image with: ");
-                                String password = sc.nextLine();
-                                while (!PasswordCheck.passwordChecker(password)) {
-                                    System.out.print("Please enter a stronger password: ");
-                                    password = sc.nextLine();
+                            if (new File(CLIENTPATH + name).exists()){
+                                if(sendReponse.equals("File does not exist in server")) {
+                                    System.out.print("Please enter a password to encrypt image with: ");
+                                    String password = sc.nextLine();
+                                    while (!PasswordCheck.passwordChecker(password)) {
+                                        System.out.print("Please enter a stronger password: ");
+                                        password = sc.nextLine();
+                                    }
+                                    sendFile(CLIENTPATH + name, name, password);
                                 }
-                                sendFile(CLIENTPATH + name, name, password);
                             } else {
-                                System.out.println("file does not exist in server");
+                                System.out.println("file does not exist in client");
                             }
                         } else {
                             while (!(res = br.readLine()).equals("\0")) {

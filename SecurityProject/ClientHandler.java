@@ -95,7 +95,14 @@ public class ClientHandler implements Runnable {
                         if (tokens.length != 2) {
                             pr.println(insufficientArg());
                         } else {
-                            System.out.println("Received file\n");
+                            String name = tokens[1];
+                            if (new File(SERVERPATH + name).exists()) {
+                                pr.println("File already exist in server");
+                            } else {
+                                pr.println("File does not exist in server");
+                                System.out.println("Received file\n");
+                            }
+
                         }
                         break;
                     // send to client
@@ -106,7 +113,7 @@ public class ClientHandler implements Runnable {
 
                             String name = tokens[1];
                             if (new File(SERVERPATH + name).exists()) {
-                                pr.println("Sucessfully sent encrypted image to client");
+                                pr.println("Successfully sent encrypted image to client");
                             } else {
                                 pr.println("File does not exist in server");
                             }
